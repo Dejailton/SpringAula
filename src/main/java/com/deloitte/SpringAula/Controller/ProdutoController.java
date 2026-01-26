@@ -1,7 +1,7 @@
 package com.deloitte.SpringAula.Controller;
 
 import com.deloitte.SpringAula.service.ProdutoService;
-import com.deloitte.SpringAula.Classe.Produto;
+import com.deloitte.SpringAula.Entity.Produto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -31,9 +30,11 @@ public class ProdutoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Produto> obterProduto(@PathVariable Long id) {
-        Optional<Produto> produto = produtoService.buscarPorId(id);
-        return produto.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Produto produto = produtoService.buscarPorId(id);
+        if (produto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(produto);
     }
 
     @PostMapping
@@ -41,6 +42,15 @@ public class ProdutoController {
         Produto criado = produtoService.adicionar(produto);
         URI location = URI.create("/produtos/" + criado.getId());
         return ResponseEntity.created(location).body(criado);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Produto> atualizarProduto(@PathVariable Long id, @RequestBody Produto produto) {
+        Produto atualizado = produtoService.atualizar(id, produto);
+        if (atualizado == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")

@@ -1,56 +1,51 @@
 package com.deloitte.SpringAula.service;
 
-import com.deloitte.SpringAula.Classe.Produto;
+import com.deloitte.SpringAula.Entity.Produto;
+import com.deloitte.SpringAula.repository.ProdutoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class ProdutoService {
 
-    private final List<Produto> produtos = new ArrayList<>();
-    private final AtomicLong nextId = new AtomicLong(0);
+    @Autowired
+    private ProdutoRepository produtoRepository;
 
     public List<Produto> listar() {
-        return new ArrayList<>(produtos);
+        return produtoRepository.findAll();
     }
 
     public Produto adicionar(Produto produto) {
-        if (produto == null) {
-            throw new IllegalArgumentException("produto não pode ser nulo");
-        }
-        long id = nextId.incrementAndGet();
-        produto.setId(id);
-        produtos.add(produto);
-        return produto;
+        return produtoRepository.save(produto);
     }
 
 
-    public Optional<Produto> buscarPorId(Long id) {
-        if (id == null) {
-            return Optional.empty();
+    public Produto buscarPorId(Long id) {
+        return produtoRepository.findById(id).orElse(null);
+    }
+
+    public Produto atualizar(Long id, Produto produto) {
+        Optional<Produto> existente = produtoRepository.findById(id);
+        if (!existente.isPresent()) {
+            return null;
         }
-        for (Produto p : produtos) {
-            if (p.getId() != null && p.getId().equals(id)) {
-                return Optional.of(p);
-            }
+        Produto atual = existente.get();
+        if (produto.getNome() != null) {
+            atual.setNome(produto.getNome());
         }
-        return Optional.empty();
+        if (produto.getPreco() != null) {
+            atual.setPreco(produto.getPreco());
+        }
+        return produtoRepository.save(atual);
     }
 
     public boolean remover(Long id) {
-        if (id == null) {
-            return false;
-        }
-        for (int i = 0; i < produtos.size(); i++) {
-            Produto p = produtos.get(i);
-            if (p != null && p.getId() != null && p.getId().equals(id)) {
-                produtos.remove(i);
-                return true;
-            }
+        if (produtoRepository.existsById(id)) {
+            produtoRepository.deleteById(id);
+            return true;
         }
         return false;
     }
