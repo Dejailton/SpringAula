@@ -1,6 +1,6 @@
-package com.deloitte.SpringAula.repository;
+package com.deloitte.springaula.repository;
 
-import com.deloitte.SpringAula.Entity.Produto;
+import com.deloitte.springaula.model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
