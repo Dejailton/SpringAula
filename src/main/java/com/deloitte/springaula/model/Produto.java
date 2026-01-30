@@ -1,4 +1,4 @@
-package com.deloitte.SpringAula.Entity;
+package com.deloitte.springaula.model;
 
 import jakarta.persistence.*;
 import lombok.*;

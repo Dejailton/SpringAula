@@ -1,4 +1,4 @@
-package com.deloitte.SpringAula;
+package com.deloitte.springaula;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
