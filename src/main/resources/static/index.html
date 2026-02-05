@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Produtos</title>
+  <link rel="icon" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/box-seam.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0d6efd">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="styles.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Barra de navegação principal">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#"><i class="bi bi-box-seam me-2"></i>Gerenciador de Produtos</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link api-docs-btn ms-2" href="/swagger-ui/index.html" target="_blank">API Docs(Swagger)</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h1 class="h3 mb-0">Produtos</h1>
+        <small class="text-muted" id="totalCount">—</small>
+      </div>
+      <div>
+        <button id="btnRefresh" class="btn btn-outline-secondary me-2" title="Atualizar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Atualizar lista"><i class="bi bi-arrow-clockwise"></i></button>
+        <button id="btnNew" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Novo produto"><i class="bi bi-plus-lg me-1"></i> Novo Produto</button>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text">Buscar</span>
+              <label for="searchInput" class="visually-hidden">Buscar produtos</label>
+              <input id="searchInput" type="search" class="form-control" placeholder="Pesquisar por nome..." />
+            </div>
+          </div>
+          <div class="col-md-6 d-flex justify-content-end align-items-center gap-2">
+            <label for="pageSizeSelect" class="mb-0">Itens por página</label>
+            <select id="pageSizeSelect" class="form-select w-auto">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered align-middle" id="produtosTable">
+            <thead class="table-light">
+              <tr>
+                <th style="width:6%">ID</th>
+                <th>Nome</th>
+                <th style="width:12%" class="sortable text-end" data-field="preco">Preço <i class="bi bi-arrow-down-up"></i></th>
+                <th style="width:18%">Ações</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <div>
+            <small class="text-muted" id="pageInfo">Página 1</small>
+          </div>
+          <nav aria-label="Paginação de produtos">
+            <ul id="pagination" class="pagination mb-0"></ul>
+          </nav>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de criar e editar -->
+  <div class="modal fade" id="produtoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="produtoForm" class="modal-content needs-validation" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Novo Produto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="produtoId" />
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome</label>
+            <input id="nome" name="nome" class="form-control" placeholder="Nome do produto" required />
+            <div class="invalid-feedback">O nome é obrigatório.</div>
+          </div>
+          <div class="mb-3">
+            <label for="preco" class="form-label">Preço</label>
+            <input id="preco" name="preco" type="text" inputmode="decimal" placeholder="R$ 0,00" class="form-control" required />
+            <div class="invalid-feedback">Informe um preço válido (0 ou maior).</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de confirmação para deletar -->
+  <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmar</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p>Deseja realmente remover este produto?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="confirmDeleteNo" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+          <button id="confirmDeleteYes" type="button" class="btn btn-danger">Sim, remover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 1080">
+    <div id="toastContainer" class="toast-container"></div>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay d-none">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Carregando...</span></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

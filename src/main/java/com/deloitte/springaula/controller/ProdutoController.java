@@ -4,7 +4,6 @@ import com.deloitte.springaula.service.ProdutoService;
 import com.deloitte.springaula.dto.ProdutoRequestDTO;
 import com.deloitte.springaula.dto.ProdutoResponseDTO;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,14 +19,15 @@ public class ProdutoController {
 
     private final ProdutoService produtoService;
 
-    @Autowired
     public ProdutoController(ProdutoService produtoService) {
         this.produtoService = produtoService;
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "API de Produtos rodando com Spring Boot";
+    @PostMapping
+    public ResponseEntity<ProdutoResponseDTO> adicionarProduto(@Valid @RequestBody ProdutoRequestDTO produtoDto) {
+        ProdutoResponseDTO criado = produtoService.salvar(produtoDto);
+        URI location = URI.create("/produtos/" + criado.id());
+        return ResponseEntity.created(location).body(criado);
     }
 
     @GetMapping
@@ -41,12 +41,6 @@ public class ProdutoController {
         return ResponseEntity.ok(produto);
     }
 
-    @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> adicionarProduto(@Valid @RequestBody ProdutoRequestDTO produtoDto) {
-        ProdutoResponseDTO criado = produtoService.salvar(produtoDto);
-        URI location = URI.create("/produtos/" + criado.id());
-        return ResponseEntity.created(location).body(criado);
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoResponseDTO> atualizarProduto(@PathVariable Long id, @Valid @RequestBody ProdutoRequestDTO produtoDto) {
