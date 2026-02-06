@@ -452,6 +452,48 @@ As seguintes variáveis de ambiente são configuradas no Azure Portal (Configura
 | `SPRING_JPA_HIBERNATE_DDL_AUTO` | `update`                                       |
 | `SPRING_H2_CONSOLE_ENABLED` | `false`                                        |
 
+### 🔄 CI/CD com GitHub Actions
+
+O projeto utiliza **GitHub Actions** para automatizar o processo de integração contínua (CI) e entrega contínua (CD). Cada commit ou pull request na branch `main` dispara automaticamente o pipeline de CI/CD.
+
+#### 📋 Pipeline de CI/CD
+
+O workflow está configurado no arquivo `.github/workflows/build-azure.yml` e executa as seguintes etapas:
+
+##### **1️⃣ Build e Testes** (Job: `build`)
+- ✅ Checkout do código
+- ✅ Configuração do ambiente Java 21
+- ✅ Cache de dependências Maven
+- ✅ Compilação do projeto (`mvn clean package`)
+- ✅ Execução de testes automatizados
+- ✅ Geração do artefato `.jar`
+- ✅ Upload do artefato para o próximo job
+
+##### **2️⃣ Deploy para Azure** (Job: `deploy`)
+- ✅ Download do artefato gerado
+- ✅ Login no Azure usando credenciais seguras
+- ✅ Deploy automático no Azure App Service
+- ✅ Verificação do deploy
+- ✅ Logout do Azure
+
+#### 🚦 Gatilhos do Workflow
+
+O pipeline é acionado nas seguintes situações:
+- **Push na branch `main`**: Executa build + deploy
+- **Pull Request para `main`**: Executa apenas build e testes
+- **Manualmente**: Via `workflow_dispatch` no GitHub Actions
+
+#### 🔐 Secrets e Variáveis
+
+O workflow utiliza secrets e variáveis configuradas no GitHub:
+
+| Tipo | Nome | Descrição |
+|------|------|-----------|
+| Secret | `AZURE_CREDENTIALS` | Credenciais de autenticação do Azure |
+| Variable | `AZURE_RESOURCE_GROUP` | Nome do Resource Group no Azure |
+| Variable | `AZURE_WEBAPP_NAME` | Nome do Web App no Azure |
+
+---
 ### 📊 Monitoramento
 
 O Azure fornece ferramentas de monitoramento integradas:
