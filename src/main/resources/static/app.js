@@ -1,4 +1,4 @@
-const baseUrl = window.location.origin;
+const baseUrl = '/produtos';
 const produtosTableBody = document.querySelector('#produtosTable tbody');
 const produtoModalEl = document.getElementById('produtoModal');
 let produtoModal = null;
@@ -8,7 +8,6 @@ if (produtoModalEl && window.bootstrap && bootstrap.Modal) {
 const produtoForm = document.getElementById('produtoForm');
 const modalTitle = document.getElementById('modalTitle');
 const alertPlaceholder = document.getElementById('alertPlaceholder');
-const toastContainer = document.getElementById('toastContainer');
 const loadingOverlay = document.getElementById('loadingOverlay');
 const btnRefresh = document.getElementById('btnRefresh');
 const searchInput = document.getElementById('searchInput');
@@ -129,34 +128,28 @@ function updateSortIcons() {
 function showLoading() { if (loadingOverlay) loadingOverlay.classList.remove('d-none'); }
 function hideLoading() { if (loadingOverlay) loadingOverlay.classList.add('d-none'); }
 
-function showToast(message, type = 'primary', timeout = 4000) {
-  if (!toastContainer) {
-    try { alert(message); } catch (e) { console.log(type.toUpperCase() + ': ' + message); }
-    return;
-  }
-  const toastEl = document.createElement('div');
-  toastEl.className = 'toast align-items-center text-bg-' + (type === 'danger' ? 'danger' : (type === 'warning' ? 'warning' : (type === 'success' ? 'success' : 'primary'))) + ' border-0';
-  toastEl.setAttribute('role', 'alert');
-  toastEl.setAttribute('aria-live', 'assertive');
-  toastEl.setAttribute('aria-atomic', 'true');
-  toastEl.innerHTML = `
-    <div class="d-flex">
-      <div class="toast-body">${escapeHtml(message)}</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
-    </div>
-  `;
-  toastContainer.appendChild(toastEl);
-  const toast = new bootstrap.Toast(toastEl, { delay: timeout });
-  toast.show();
-  toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+function showAlert(message, type = 'info') {
+  showFeedbackModal(type === 'success' ? 'Sucesso' : type === 'warning' ? 'Aviso' : type === 'danger' ? 'Erro' : 'Info', message);
 }
 
-function showAlert(message, type = 'info') { showToast(message, type === 'danger' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'primary'); }
+function showFeedbackModal(title, message) {
+  try {
+    if (!feedbackModal && feedbackModalEl && window.bootstrap && bootstrap.Modal) {
+      feedbackModal = new bootstrap.Modal(feedbackModalEl);
+    }
+    if (feedbackTitleEl) feedbackTitleEl.textContent = title || 'Mensagem';
+    if (feedbackBodyEl) feedbackBodyEl.textContent = message || '';
+    if (feedbackModal) feedbackModal.show();
+    else alert(`${title}: ${message}`);
+  } catch (e) {
+    alert(`${title}: ${message}`);
+  }
+}
 
 async function fetchProducts() {
   showLoading();
   try {
-    const res = await fetch(`${baseUrl}/produtos`);
+    const res = await fetch(`${baseUrl}`);
     if (!res.ok) {
       const text = await res.text();
       throw new Error(text || 'Falha ao buscar produtos');
@@ -239,7 +232,7 @@ function openCreateModal() {
 async function openEditModal(id) {
   showLoading();
   try {
-    const res = await fetch(`${baseUrl}/produtos/${id}`);
+    const res = await fetch(`${baseUrl}/${id}`);
     if (!res.ok) {
       const text = await res.text();
       throw new Error(text || 'Produto não encontrado');
@@ -257,6 +250,28 @@ async function openEditModal(id) {
     showAlert(err.message, 'danger');
   } finally {
     hideLoading();
+  }
+}
+
+let feedbackModal = null;
+const feedbackModalEl = document.getElementById('feedbackModal');
+const feedbackTitleEl = document.getElementById('feedbackTitle');
+const feedbackBodyEl = document.getElementById('feedbackBody');
+if (feedbackModalEl && window.bootstrap && bootstrap.Modal) {
+  feedbackModal = new bootstrap.Modal(feedbackModalEl);
+}
+
+function showFeedbackModal(title, message) {
+  try {
+    if (!feedbackModal && feedbackModalEl && window.bootstrap && bootstrap.Modal) {
+      feedbackModal = new bootstrap.Modal(feedbackModalEl);
+    }
+    if (feedbackTitleEl) feedbackTitleEl.textContent = title || 'Mensagem';
+    if (feedbackBodyEl) feedbackBodyEl.textContent = message || '';
+    if (feedbackModal) feedbackModal.show();
+    else alert(`${title}: ${message}`);
+  } catch (e) {
+    alert(`${title}: ${message}`);
   }
 }
 
@@ -278,7 +293,7 @@ async function submitForm(event) {
   }
 
   const method = id ? 'PUT' : 'POST';
-  const url = id ? `${baseUrl}/produtos/${id}` : `${baseUrl}/produtos`;
+  const url = id ? `${baseUrl}/${id}` : `${baseUrl}`;
 
   const saveBtn = document.getElementById('saveBtn');
   saveBtn.disabled = true;
@@ -292,14 +307,14 @@ async function submitForm(event) {
     if (!res.ok) {
       const data = await parseErrorResponse(res);
       showApiErrors(data);
-      throw new Error(data.message || 'Erro na requisição');
+      return;
     }
-    await res.json();
+    const body = await res.json();
     if (produtoModal) produtoModal.hide();
+    showFeedbackModal('Sucesso', id ? 'Produto atualizado.' : 'Produto criado.');
     fetchProducts();
-    showToast(id ? 'Produto atualizado.' : 'Produto criado.', 'success');
   } catch (err) {
-    showAlert(err.message, 'danger');
+    showFeedbackModal('Erro', err.message || 'Falha na operação');
   } finally {
     hideLoading();
     saveBtn.disabled = false;
@@ -314,15 +329,16 @@ function openConfirmDelete(id) {
 async function doDeleteProduct(id) {
   showLoading();
   try {
-    const res = await fetch(`${baseUrl}/produtos/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${baseUrl}/${id}`, { method: 'DELETE' });
     if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || 'Falha ao remover');
+      const data = await parseErrorResponse(res);
+      showApiErrors(data);
+      return;
     }
-    showToast('Produto removido.', 'success');
+    showFeedbackModal('Sucesso', 'Produto removido.');
     fetchProducts();
   } catch (err) {
-    showAlert(err.message, 'danger');
+    showFeedbackModal('Erro', err.message || 'Falha ao remover');
   } finally {
     hideLoading();
     if (confirmDeleteModal) confirmDeleteModal.hide();
@@ -371,24 +387,17 @@ function showApiErrors(data) {
         if (el.setCustomValidity) el.setCustomValidity(msg);
         shown = true;
       } else {
-        showToast(msg, 'danger');
+        showFeedbackModal('Erro', msg);
       }
     });
     if (shown) return;
   }
 
   if (data && typeof data === 'object') {
-    if (data.message) {
-      showToast(data.message, 'danger');
-      return;
-    }
-    if (data.error && typeof data.error === 'string') {
-      showToast(data.error, 'danger');
-      return;
-    }
+    if (data.message) { showFeedbackModal('Erro', data.message); return; }
+    if (data.error && typeof data.error === 'string') { showFeedbackModal('Erro', data.error); return; }
   }
-
-  showToast('Erro desconhecido', 'danger');
+  showFeedbackModal('Erro', 'Erro desconhecido');
 }
 
 
