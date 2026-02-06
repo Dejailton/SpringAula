@@ -22,7 +22,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class ProdutoServiceImplTest {
@@ -44,7 +46,7 @@ class ProdutoServiceImplTest {
     }
 
     @Test
-    //Teste de salvar: deve persistir e retornar o DTO de resposta")
+        //Teste de salvar: deve persistir e retornar o DTO de resposta")
     void salvar_devePersistirERetornarResposta() {
         ProdutoRequestDTO dto = new ProdutoRequestDTO("Caneta", 2.5);
         Produto entity = new Produto(null, "Caneta", 2.5);
@@ -64,7 +66,7 @@ class ProdutoServiceImplTest {
     }
 
     @Test
-    //Teste para salvar: quando há violação de regra de negócio deve lançar BusinessRuleViolationException"
+        //Teste para salvar: quando há violação de regra de negócio deve lançar BusinessRuleViolationException"
     void salvar_quandoViolacaoRegraNegocio() {
         ProdutoRequestDTO dto = new ProdutoRequestDTO("Caneta", 2.5);
         when(rule.validate(null, dto)).thenReturn(Map.of("nome", "já existe"));
@@ -73,14 +75,14 @@ class ProdutoServiceImplTest {
     }
 
     @Test
-    // Teste para buscar por ID: quando não encontrado deve lançar ProdutoNotFoundException"
+        // Teste para buscar por ID: quando não encontrado deve lançar ProdutoNotFoundException"
     void buscarPorId_quandoNaoEncontrado() {
         when(produtoRepository.findById(99L)).thenReturn(Optional.empty());
         assertThrows(ProdutoNotFoundException.class, () -> service.buscarPorId(99L));
     }
 
     @Test
-    //Teste da função atualizar: deve atualizar a entidade existente e retornar o DTO atualizado")
+        //Teste da função atualizar: deve atualizar a entidade existente e retornar o DTO atualizado")
     void atualizar_deveAtualizarERetornarResposta() {
         ProdutoRequestDTO dto = new ProdutoRequestDTO("Lapis", 1.0);
         Produto existing = new Produto(2L, "LapisAntigo", 0.5);
@@ -98,5 +100,23 @@ class ProdutoServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(2L);
         assertThat(result.nome()).isEqualTo("Lapis");
+    }
+
+    @Test
+    void remover_quandoExiste_deveDeletar() {
+        Long id = 10L;
+        when(produtoRepository.existsById(id)).thenReturn(true);
+
+        service.remover(id);
+
+        verify(produtoRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    void remover_quandoNaoExiste_deveLancarProdutoNotFound() {
+        Long id = 11L;
+        when(produtoRepository.existsById(id)).thenReturn(false);
+
+        assertThrows(ProdutoNotFoundException.class, () -> service.remover(id));
     }
 }
