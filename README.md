@@ -555,7 +555,7 @@ Este projeto foi desenvolvido para fins acadêmicos e de aprendizado.
 
 **Dejailton**
 - GitHub: [@Dejailton](https://github.com/Dejailton)
-- Projeto: [projetospring](https://github.com/Dejailton/projetospring)
+- Projeto: [projetospring](https://github.com/Dejailton/SpringAula)
 
 ---
 
