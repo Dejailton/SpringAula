@@ -6,16 +6,15 @@ import com.deloitte.springaula.model.Produto;
 import com.deloitte.springaula.repository.ProdutoRepository;
 import com.deloitte.springaula.exception.ProdutoNotFoundException;
 import com.deloitte.springaula.mapper.ProdutoMapper;
-import com.deloitte.springaula.rules.ProdutoBusinessRule;
-import com.deloitte.springaula.exception.BusinessRuleViolationException;
 import com.deloitte.springaula.service.ProdutoService;
+import com.deloitte.springaula.service.rules.ProdutoBusinessRule;
+import com.deloitte.springaula.exception.BusinessRuleViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class ProdutoServiceImpl implements ProdutoService {
@@ -35,7 +34,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         return produtoRepository.findAll()
                 .stream()
                 .map(produtoMapper::toResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private void validateRules(Long id, ProdutoRequestDTO dto) {

@@ -4,14 +4,15 @@ import com.deloitte.springaula.service.ProdutoService;
 import com.deloitte.springaula.dto.ProdutoRequestDTO;
 import com.deloitte.springaula.dto.ProdutoResponseDTO;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-import java.net.URI;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 
 @RestController
@@ -20,41 +21,40 @@ public class ProdutoController {
 
     private final ProdutoService produtoService;
 
-    @Autowired
     public ProdutoController(ProdutoService produtoService) {
         this.produtoService = produtoService;
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "API de Produtos rodando com Spring Boot";
+    @PostMapping
+    @Operation(summary = "Cadastrar produto", description = "Cadastra um novo produto com os dados fornecidos.")
+    public ResponseEntity<ProdutoResponseDTO> adicionarProduto(@Valid @RequestBody ProdutoRequestDTO produtoDto) {
+        ProdutoResponseDTO criado = produtoService.salvar(produtoDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
     @GetMapping
+    @Operation(summary = "Listar produtos", description = "Retorna a lista de todos os produtos cadastrados.")
     public List<ProdutoResponseDTO> listarProdutos() {
         return produtoService.listar();
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar produto por ID", description = "Retorna um produto específico pelo ID.")
     public ResponseEntity<ProdutoResponseDTO> obterProduto(@PathVariable Long id) {
         ProdutoResponseDTO produto = produtoService.buscarPorId(id);
         return ResponseEntity.ok(produto);
     }
 
-    @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> adicionarProduto(@Valid @RequestBody ProdutoRequestDTO produtoDto) {
-        ProdutoResponseDTO criado = produtoService.salvar(produtoDto);
-        URI location = URI.create("/produtos/" + criado.id());
-        return ResponseEntity.created(location).body(criado);
-    }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar produto", description = "Atualiza os dados de um produto existente pelo ID.")
     public ResponseEntity<ProdutoResponseDTO> atualizarProduto(@PathVariable Long id, @Valid @RequestBody ProdutoRequestDTO produtoDto) {
         ProdutoResponseDTO atualizado = produtoService.atualizar(id, produtoDto);
         return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Remover produto", description = "Remove um produto pelo ID.")
     public ResponseEntity<Void> removerProduto(@PathVariable Long id) {
         produtoService.remover(id);
         return ResponseEntity.noContent().build();

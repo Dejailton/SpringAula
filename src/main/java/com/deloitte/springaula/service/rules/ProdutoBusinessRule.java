@@ -1,4 +1,4 @@
-package com.deloitte.springaula.rules;
+package com.deloitte.springaula.service.rules;
 
 import com.deloitte.springaula.dto.ProdutoRequestDTO;
 
