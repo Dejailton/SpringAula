@@ -542,6 +542,7 @@ Este projeto foi desenvolvido para fins acadêmicos e de aprendizado.
 ## 👤 Autor
 
 **Dejailton**
+
 - Linkedin: [@Dejailton](https://www.linkedin.com/in/dejailton-da-silva-queiroz-771867319/)
 
 ---
