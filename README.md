@@ -3,7 +3,6 @@
 [![Java](https://img.shields.io/badge/Linguagem-Java-%23ED8B00.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Framework-Spring%20Boot-brightgreen)](https://spring.io/projects/spring-boot)
 [![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apache-maven)](https://maven.apache.org/)
-[![Azure](https://img.shields.io/badge/Deploy-Azure-0078D4?logo=microsoft-azure)](https://bootcamp-produtos-dejailton.azurewebsites.net/)
 
 ## 📚 Descrição
 Este é um projeto acadêmico desenvolvido com o objetivo de estudar e experimentar o framework **Spring Boot**. Ele foi projetado para explorar conceitos como criação de APIs RESTful, injeção de dependências, gerenciamento de banco de dados com **JPA/Hibernate**, entre outros aspectos fundamentais do desenvolvimento backend com Java.
@@ -156,7 +155,6 @@ O Console H2 permite visualizar e manipular os dados em tempo de execução:
 A API REST segue os princípios RESTful e oferece os seguintes endpoints:
 
 ### **Base URL (Local):** `http://localhost:8084`
-### **Base URL (Produção):** `https://bootcamp-produtos-dejailton.azurewebsites.net/`
 
 ---
 
