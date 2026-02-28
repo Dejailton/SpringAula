@@ -10,16 +10,6 @@ Este é um projeto acadêmico desenvolvido com o objetivo de estudar e experimen
 
 O sistema gerencia um catálogo de **produtos**, permitindo operações CRUD completas através de uma API REST e uma interface web interativa.
 
----
-
-## 🌐 Aplicação em Produção
-
-A aplicação está disponível online no Azure:
-
-**🔗 URL:** [https://bootcamp-produtos-dejailton.azurewebsites.net/](https://bootcamp-produtos-dejailton.azurewebsites.net/)
-
----
-
 ## 🚀 Funcionalidades
 - ✅ API RESTful para gerenciamento de produtos
 - ✅ Interface web responsiva com Bootstrap
@@ -360,7 +350,6 @@ A aplicação possui documentação interativa da API gerada automaticamente com
 
 **Acesso:**
 - **Local:** [http://localhost:8084/swagger-ui/index.html](http://localhost:8084/swagger-ui/index.html)
-- **Produção:** [https://bootcamp-produtos-dejailton.azurewebsites.net/swagger-ui/index.html](https://bootcamp-produtos-dejailton.azurewebsites.net/swagger-ui/index.html)
 
 
 ## 🗂️ Estrutura do Projeto
@@ -421,7 +410,6 @@ A aplicação está hospedada no **Azure App Service**, proporcionando alta disp
 ### 📋 Informações do Deploy
 
 - **Plataforma:** Azure App Service
-- **URL de Produção:** [https://bootcamp-produtos-dejailton.azurewebsites.net/](https://bootcamp-produtos-dejailton.azurewebsites.net/)
 - **Banco de Dados:** SQL Server (Azure SQL Database)
 - **Build:** Maven
 - **Runtime:** Java 21
@@ -554,8 +542,8 @@ Este projeto foi desenvolvido para fins acadêmicos e de aprendizado.
 ## 👤 Autor
 
 **Dejailton**
-- GitHub: [@Dejailton](https://github.com/Dejailton)
-- Projeto: [SpringAula](https://github.com/Dejailton/SpringAula)
+
+- Linkedin: [@Dejailton](https://www.linkedin.com/in/dejailton-da-silva-queiroz-771867319/)
 
 ---
 
